@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
 
 export default function Dashboard() {
@@ -8,6 +8,8 @@ export default function Dashboard() {
   const [showModal, setShowModal] = useState(false);
   const [selectedLead, setSelectedLead] = useState(null);
   const [newLead, setNewLead] = useState({ name: '', email: '', status: '', aiMessage: '' });
+  const [searchText, setSearchText] = useState('');
+  const [statusFilter, setStatusFilter] = useState('');
 
   // Authentication check
   useEffect(() => {
@@ -71,6 +73,18 @@ export default function Dashboard() {
     }
   };
 
+  const filteredLeads = useMemo(() => {
+    return leads.filter((lead) => {
+      const matchesSearch =
+        lead.name.toLowerCase().includes(searchText.toLowerCase()) ||
+        lead.email.toLowerCase().includes(searchText.toLowerCase()) ||
+        lead.aiMessage.toLowerCase().includes(searchText.toLowerCase());
+
+      const matchesStatus = statusFilter ? lead.status === statusFilter : true;
+      return matchesSearch && matchesStatus;
+    });
+  }, [leads, searchText, statusFilter]);
+
 
   return (
     <div className="min-h-screen bg-gray-100 p-6">
@@ -97,6 +111,26 @@ export default function Dashboard() {
       {/* Leads List */}
       {activeTab === 'leads' && (
         <div className="bg-white rounded-lg shadow p-6 overflow-x-auto">
+          <div className="flex flex-col md:flex-row md:space-x-4 mb-4">
+            <input
+              type="text"
+              placeholder="Search leads by name, email, AI message..."
+              value={searchText}
+              onChange={(e) => setSearchText(e.target.value)}
+              className="mb-2 md:mb-0 px-3 py-2 border border-gray-300 rounded w-full md:w-1/2 focus:ring-2 focus:ring-blue-400"
+            />
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="px-3 py-2 border border-gray-300 rounded w-full md:w-1/4 focus:ring-2 focus:ring-blue-400"
+            >
+              <option value="">Filter by Status</option>
+              <option value="new">New</option>
+              <option value="contacted">Contacted</option>
+              <option value="qualified">Qualified</option>
+              <option value="lost">Lost</option>
+            </select>
+          </div>
           <table className="min-w-full border">
             <thead className="bg-gray-50">
               <tr>
@@ -108,14 +142,15 @@ export default function Dashboard() {
               </tr>
             </thead>
             <tbody>
-              {leads.map((lead) => (
-                <tr key={lead._id} className="border-b">
-                  <td className="px-4 py-2">{lead.name}</td>
-                  <td className="px-4 py-2">{lead.email}</td>
-                  <td className="px-4 py-2">{lead.status}</td>
-                  <td className="px-4 py-2">{lead.aiMessage}</td>
-                  <td className="px-4 py-2 space-x-2">
-                    <button
+              {filteredLeads.length ? (
+                filteredLeads.map((lead) => (
+                  <tr key={lead._id} className="border-b">
+                    <td className="px-4 py-2">{lead.name}</td>
+                    <td className="px-4 py-2">{lead.email}</td>
+                    <td className="px-4 py-2">{lead.status}</td>
+                    <td className="px-4 py-2">{lead.aiMessage}</td>
+                    <td className="px-4 py-2 space-x-2">
+                       <button
                       onClick={() => {
                         setSelectedLead(lead);
                         setShowModal(true);
@@ -130,13 +165,13 @@ export default function Dashboard() {
                     >
                       Delete
                     </button>
-                  </td>
-                </tr>
-              ))}
-              {leads.length === 0 && (
+                    </td>
+                  </tr>
+                ))
+              ) : (
                 <tr>
                   <td colSpan="5" className="text-center py-4 text-gray-500">
-                    No leads found
+                    No leads found.
                   </td>
                 </tr>
               )}
@@ -144,6 +179,7 @@ export default function Dashboard() {
           </table>
         </div>
       )}
+
 
       {/* Add Lead Section */}
       {activeTab === 'addLead' && (
