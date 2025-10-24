@@ -7,7 +7,7 @@ export default function Home() {
   const router = useRouter();
 
   useEffect(() => {
-    router.replace('/signup'); // redirect to signup on page load
+    router.replace('/login'); // redirect to signup on page load
   }, [router]);
 
   return null; // or loading indicator

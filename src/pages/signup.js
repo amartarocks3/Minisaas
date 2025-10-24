@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import Link from 'next/link';
 
 export default function SignupForm() {
   const [formData, setFormData] = useState({
@@ -91,6 +92,12 @@ export default function SignupForm() {
           >
             Sign Up
           </button>
+          <p className="mt-6 text-center text-gray-600">
+         Have an account?{' '}
+        <Link href="/login" className="text-blue-600 hover:underline font-semibold">
+          Login
+        </Link>
+      </p>
         </form>
       </div>
     </div>
