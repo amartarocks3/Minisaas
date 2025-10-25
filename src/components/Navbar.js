@@ -2,11 +2,21 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export default function Navbar() {
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
+  const [authenticated, setAuthenticated] = useState(false);
+
+  // Check token presence on client side
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    setAuthenticated(!!token);
+  }, [router.pathname]); // Re-check on route change
+
+  // If not authenticated, don't render navbar
+  if (!authenticated) return null;
 
   const navItems = [
     { name: 'Dashboard', path: '/dashboard' },
