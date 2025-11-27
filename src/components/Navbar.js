@@ -31,7 +31,7 @@ export default function Navbar() {
           {/* Logo */}
           <div className="flex items-center">
             <Link href="/dashboard" className="text-xl font-bold text-blue-600">
-              MyApp
+              Admin Dashboard
             </Link>
           </div>
 
